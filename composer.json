@@ -1,0 +1,19 @@
+{
+    "name": "ultraleet/wp-license-manager",
+    "description": "Allows Wordpress plugin integration with the Software License Manager.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rene Aavik",
+            "email": "renx81@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "psr/log": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {"Ultraleet\\WP\\LicenseManager\\": "src/"}
+    }
+}
