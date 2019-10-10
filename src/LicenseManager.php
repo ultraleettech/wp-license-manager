@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 
 class LicenseManager
 {
-    const DEMO_PACKAGE = 'DEMO';
+    const DEMO_PACKAGE = 'demo';
     const SECS_PER_DAY = 24*60*60;
 
     private $pluginId;
@@ -17,6 +17,7 @@ class LicenseManager
     private $demoStart;
     private $licenseKey;
     private $licenseData;
+    private $packages = [];
 
     /**
      * @var LoggerInterface
@@ -37,6 +38,18 @@ class LicenseManager
         $this->pluginName = $pluginName;
         $this->serverUrl = $serverUrl;
         $this->secretKey = $secretKey;
+    }
+
+    /**
+     * Set the list of package slugs in ascending order.
+     *
+     * This is required for using the packageAtLeast() method below.
+     *
+     * @param array $packages Package slugs from the SLM-enabled backend site.
+     */
+    public function setPackages(array $packages)
+    {
+        $this->packages = $packages;
     }
 
     /**
@@ -118,6 +131,20 @@ class LicenseManager
         $result = json_decode(wp_remote_retrieve_body($response), true);
         $this->log('debug', 'API query', ['args' => $args, 'result' => $result]);
         return $result;
+    }
+
+    /**
+     * Check whether currently active package is at least the given package.
+     *
+     * @param string $package Package slug from the SLM-enabled backend site.
+     * @return bool
+     */
+    public function packageAtLeast(string $package): bool
+    {
+        if (!in_array($package, $this->packages) || !in_array($currentPackage = $this->getPackage(), $this->packages)) {
+            return false;
+        }
+        return array_search($currentPackage, $this->packages) >= array_search($package, $this->packages);
     }
 
     /**
